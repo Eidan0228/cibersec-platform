@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id_usuario       Int          @id @default(autoincrement())
+  nombre           String
+  correo           String       @unique
+  contrasena_hash  String
+  fecha_registro   DateTime     @default(now())
+  rol              Rol          @default(USER)
+  puntos_totales   Int          @default(0)
+  retos_creados    Reto[]       @relation("CreadorRetos")
+  soluciones       Solucion[]
+  comentarios      Comentario[]
+  evaluaciones     Evaluacion[]
+}
+
+model Reto {
+  id_reto         Int              @id @default(autoincrement())
+  titulo          String
+  descripcion     String
+  nivel           Nivel
+  categoria       String
+  fecha_creacion  DateTime         @default(now())
+  id_creador      Int
+  creador         Usuario          @relation("CreadorRetos", fields: [id_creador], references: [id_usuario])
+  soluciones      Solucion[]
+  archivos        ArchivoAdjunto[]
+}
+
+model Solucion {
+  id_solucion         Int          @id @default(autoincrement())
+  contenido_respuesta String
+  fecha_envio         DateTime     @default(now())
+  estado              EstadoSolucion @default(PENDIENTE)
+  puntaje_obtenido    Int          @default(0)
+  id_usuario          Int
+  usuario             Usuario      @relation(fields: [id_usuario], references: [id_usuario])
+  id_reto             Int
+  reto                Reto         @relation(fields: [id_reto], references: [id_reto])
+  comentarios         Comentario[]
+  evaluaciones        Evaluacion[]
+}
+
+model Comentario {
+  id_comentario Int      @id @default(autoincrement())
+  contenido     String
+  fecha         DateTime @default(now())
+  id_usuario    Int
+  usuario       Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  id_solucion   Int
+  solucion      Solucion @relation(fields: [id_solucion], references: [id_solucion])
+}
+
+model Evaluacion {
+  id_evaluacion Int      @id @default(autoincrement())
+  puntuacion    Int
+  comentario    String?
+  fecha         DateTime @default(now())
+  id_solucion   Int
+  solucion      Solucion @relation(fields: [id_solucion], references: [id_solucion])
+  id_usuario    Int
+  usuario       Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@unique([id_usuario, id_solucion])
+}
+
+model ArchivoAdjunto {
+  id_archivo     Int    @id @default(autoincrement())
+  nombre_archivo String
+  ruta           String
+  tipo           String
+  id_reto        Int
+  reto           Reto   @relation(fields: [id_reto], references: [id_reto])
+}
+
+enum Rol {
+  USER
+  ADMIN
+}
+
+enum Nivel {
+  BASICO
+  INTERMEDIO
+  AVANZADO
+}
+
+enum EstadoSolucion {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
