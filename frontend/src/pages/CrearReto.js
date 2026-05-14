@@ -22,51 +22,74 @@ const CrearReto = () => {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto', padding: '20px' }}>
-      <h2>Crear Reto</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '10px' }}>
+    <div style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{
+        backgroundColor: '#0d0d1a',
+        border: '1px solid #00ff88',
+        borderRadius: '8px',
+        padding: '40px',
+        width: '100%',
+        maxWidth: '550px',
+        boxShadow: '0 0 30px rgba(0, 255, 136, 0.1)'
+      }}>
+        <h2 style={{ color: '#00ff88', marginBottom: '8px', fontSize: '1.4rem', letterSpacing: '2px' }}>
+          &gt; CREAR RETO
+        </h2>
+        <p style={{ color: '#555', fontSize: '0.8rem', marginBottom: '30px' }}>
+          Define un nuevo reto para la comunidad
+        </p>
+
+        {error && (
+          <div style={{
+            backgroundColor: '#1a0000',
+            border: '1px solid #ff4444',
+            color: '#ff4444',
+            padding: '10px',
+            borderRadius: '4px',
+            marginBottom: '20px',
+            fontSize: '0.85rem'
+          }}>
+            ⚠ {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <label style={{ fontSize: '0.75rem', color: '#00ff88', letterSpacing: '1px' }}>TÍTULO</label>
           <input
             type="text"
-            placeholder="Título"
+            placeholder="Nombre del reto"
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
           />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
+
+          <label style={{ fontSize: '0.75rem', color: '#00ff88', letterSpacing: '1px' }}>DESCRIPCIÓN</label>
           <textarea
-            placeholder="Descripción"
+            placeholder="Describe el reto detalladamente..."
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
-            style={{ width: '100%', height: '100px', padding: '8px' }}
+            style={{ height: '120px', resize: 'vertical' }}
           />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <select
-            value={nivel}
-            onChange={(e) => setNivel(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-          >
+
+          <label style={{ fontSize: '0.75rem', color: '#00ff88', letterSpacing: '1px' }}>NIVEL</label>
+          <select value={nivel} onChange={(e) => setNivel(e.target.value)}>
             <option value="BASICO">Básico</option>
             <option value="INTERMEDIO">Intermedio</option>
             <option value="AVANZADO">Avanzado</option>
           </select>
-        </div>
-        <div style={{ marginBottom: '10px' }}>
+
+          <label style={{ fontSize: '0.75rem', color: '#00ff88', letterSpacing: '1px' }}>CATEGORÍA</label>
           <input
             type="text"
-            placeholder="Categoría"
+            placeholder="Ej: Web Security, Redes, Criptografía..."
             value={categoria}
             onChange={(e) => setCategoria(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
           />
-        </div>
-        <button type="submit" style={{ width: '100%', padding: '10px' }}>
-          Crear Reto
-        </button>
-      </form>
+
+          <button type="submit" style={{ width: '100%', padding: '12px', marginTop: '10px', fontSize: '0.95rem', letterSpacing: '1px' }}>
+            CREAR RETO →
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

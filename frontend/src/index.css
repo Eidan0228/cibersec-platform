@@ -1,0 +1,58 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0a0a0f;
+  color: #e0e0e0;
+  font-family: 'Courier New', Courier, monospace;
+  min-height: 100vh;
+}
+
+a {
+  color: #00ff88;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #00cc66;
+}
+
+button {
+  cursor: pointer;
+  background-color: #00ff88;
+  color: #0a0a0f;
+  border: none;
+  padding: 10px 20px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #00cc66;
+}
+
+input, textarea, select {
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  border: 1px solid #00ff88;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #00cc66;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #555;
+}

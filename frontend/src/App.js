@@ -8,11 +8,19 @@ import RetoDetalle from './pages/RetoDetalle';
 import CrearReto from './pages/CrearReto';
 import Ranking from './pages/Ranking';
 import Chat from './pages/Chat';
+import Admin from './pages/Admin';
 import { useAuth } from './context/AuthContext';
 
 const RutaProtegida = ({ children }) => {
   const { usuario } = useAuth();
   return usuario ? children : <Navigate to="/login" />;
+};
+
+const RutaAdmin = ({ children }) => {
+  const { usuario } = useAuth();
+  if (!usuario) return <Navigate to="/login" />;
+  if (usuario.rol !== 'ADMIN') return <Navigate to="/retos" />;
+  return children;
 };
 
 function App() {
@@ -28,6 +36,7 @@ function App() {
         <Route path="/retos/crear" element={<RutaProtegida><CrearReto /></RutaProtegida>} />
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/chat" element={<RutaProtegida><Chat /></RutaProtegida>} />
+        <Route path="/admin" element={<RutaAdmin><Admin /></RutaAdmin>} />
       </Routes>
     </Router>
   );

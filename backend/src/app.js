@@ -9,6 +9,7 @@ const comentariosRoutes = require('./routes/comentarios.routes');
 const evaluacionesRoutes = require('./routes/evaluaciones.routes');
 const rankingRoutes = require('./routes/ranking.routes');
 const chatRoutes = require('./routes/chat.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/comentarios', comentariosRoutes);
 app.use('/evaluaciones', evaluacionesRoutes);
 app.use('/ranking', rankingRoutes);
 app.use('/chat', chatRoutes);
+app.use('/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.json({ success: true, data: 'Servidor funcionando correctamente' });
