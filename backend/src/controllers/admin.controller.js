@@ -86,4 +86,35 @@ const obtenerTodasSoluciones = async (req, res) => {
   }
 };
 
-module.exports = { obtenerUsuarios, eliminarUsuario, cambiarEstadoSolucion, obtenerTodasSoluciones };
+const obtenerTodosRetos = async (req, res) => {
+  try {
+    const retos = await prisma.reto.findMany({
+      include: {
+        creador: { select: { nombre: true, correo: true } },
+        _count: { select: { soluciones: true } }
+      },
+      orderBy: { fecha_creacion: 'desc' }
+    });
+    return res.json({ success: true, data: retos });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+};
+
+const editarRetoAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, descripcion, nivel, categoria } = req.body;
+
+    const reto = await prisma.reto.update({
+      where: { id_reto: parseInt(id) },
+      data: { titulo, descripcion, nivel, categoria }
+    });
+
+    return res.json({ success: true, data: reto });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+};
+
+module.exports = { obtenerUsuarios, eliminarUsuario, cambiarEstadoSolucion, obtenerTodasSoluciones, obtenerTodosRetos, editarRetoAdmin };
