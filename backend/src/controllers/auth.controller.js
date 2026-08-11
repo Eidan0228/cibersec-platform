@@ -73,5 +73,38 @@ const login = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 };
+const cambiarContrasena = async (req, res) => {
+  try {
+    const { contrasena_actual, contrasena_nueva } = req.body;
+    const id_usuario = req.usuario.id_usuario;
 
-module.exports = { register, login };
+    if (!contrasena_actual || !contrasena_nueva) {
+      return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
+    }
+
+    if (contrasena_nueva.length < 6) {
+      return res.status(400).json({ success: false, message: 'La nueva contraseña debe tener mínimo 6 caracteres' });
+    }
+
+    const usuario = await prisma.usuario.findUnique({ where: { id_usuario } });
+
+    const contrasenaValida = await bcrypt.compare(contrasena_actual, usuario.contrasena_hash);
+    if (!contrasenaValida) {
+      return res.status(401).json({ success: false, message: 'La contraseña actual es incorrecta' });
+    }
+
+    const contrasena_hash = await bcrypt.hash(contrasena_nueva, 10);
+
+    await prisma.usuario.update({
+      where: { id_usuario },
+      data: { contrasena_hash }
+    });
+
+    return res.json({ success: true, data: 'Contraseña actualizada correctamente' });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+};
+module.exports = { register, login, cambiarContrasena };
+

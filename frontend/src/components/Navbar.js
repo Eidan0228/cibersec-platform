@@ -42,8 +42,7 @@ const Navbar = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
         {usuario ? (
           <>
-            <span style={{ color: '#00ff88', fontSize: '0.85rem' }}>[ {usuario.nombre} ]</span>
-            <button onClick={handleLogout} style={{
+<Link to="/cambiar-contrasena" style={{ color: '#00ff88', fontSize: '0.85rem' }}>[ {usuario.nombre} ]</Link>            <button onClick={handleLogout} style={{
               backgroundColor: 'transparent',
               color: '#ff4444',
               border: '1px solid #ff4444',
