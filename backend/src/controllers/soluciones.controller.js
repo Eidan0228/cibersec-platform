@@ -71,4 +71,40 @@ const listarSolucionesPorUsuario = async (req, res) => {
   }
 };
 
-module.exports = { enviarSolucion, listarSolucionesPorReto, listarSolucionesPorUsuario };
+const editarSolucion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { contenido_respuesta } = req.body;
+    const id_usuario = req.usuario.id_usuario;
+
+    if (!contenido_respuesta) {
+      return res.status(400).json({ success: false, message: 'El contenido es obligatorio' });
+    }
+
+    const solucion = await prisma.solucion.findUnique({ where: { id_solucion: parseInt(id) } });
+
+    if (!solucion) {
+      return res.status(404).json({ success: false, message: 'Solución no encontrada' });
+    }
+
+    if (solucion.id_usuario !== id_usuario) {
+      return res.status(403).json({ success: false, message: 'Solo el autor puede editar esta solución' });
+    }
+
+    if (solucion.estado !== 'PENDIENTE') {
+      return res.status(400).json({ success: false, message: 'Solo se pueden editar soluciones en estado PENDIENTE' });
+    }
+
+    const actualizada = await prisma.solucion.update({
+      where: { id_solucion: parseInt(id) },
+      data: { contenido_respuesta }
+    });
+
+    return res.json({ success: true, data: actualizada });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+};
+
+module.exports = { enviarSolucion, listarSolucionesPorReto, listarSolucionesPorUsuario, editarSolucion };

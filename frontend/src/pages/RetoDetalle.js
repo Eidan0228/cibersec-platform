@@ -21,6 +21,8 @@ const RetoDetalle = () => {
   const [comentarios, setComentarios] = useState({});
   const [nuevoComentario, setNuevoComentario] = useState({});
   const [puntuacion, setPuntuacion] = useState({});
+const [retoEditando, setRetoEditando] = useState(null);
+const [editContenido, setEditContenido] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +37,18 @@ const RetoDetalle = () => {
     };
     fetchData();
   }, [id]);
+
+  const guardarEdicion = async (id_solucion) => {
+  try {
+    await api.put(`/soluciones/${id_solucion}`, { contenido_respuesta: editContenido });
+    setMensaje('✓ Solución actualizada correctamente');
+    setRetoEditando(null);
+    const sol = await api.get(`/soluciones/reto/${id}`);
+    setSoluciones(sol.data.data);
+  } catch (err) {
+    setError(err.response?.data?.message || 'Error al editar solución');
+  }
+};
 
   const enviarSolucion = async (e) => {
     e.preventDefault();
@@ -165,11 +179,36 @@ const RetoDetalle = () => {
             marginBottom: '15px'
           }}>
             <p style={{ color: '#e0e0e0', marginBottom: '10px' }}>{sol.contenido_respuesta}</p>
-            <div style={{ display: 'flex', gap: '15px', fontSize: '0.78rem', marginBottom: '15px' }}>
-              <span style={{ color: '#00ff88' }}>by {sol.usuario.nombre}</span>
-              <span style={{ color: '#555' }}>estado: {sol.estado}</span>
-              <span style={{ color: '#ffaa00' }}>puntaje: {sol.puntaje_obtenido}</span>
-            </div>
+           <div style={{ display: 'flex', gap: '15px', fontSize: '0.78rem', marginBottom: '15px' }}>
+  <span style={{ color: '#00ff88' }}>by {sol.usuario.nombre}</span>
+  <span style={{ color: '#555' }}>estado: {sol.estado}</span>
+  <span style={{ color: '#ffaa00' }}>puntaje: {sol.puntaje_obtenido}</span>
+</div>
+{usuario && sol.id_usuario === usuario.id_usuario && sol.estado === 'PENDIENTE' && (
+  <div style={{ marginBottom: '15px' }}>
+    {retoEditando === sol.id_solucion ? (
+      <div>
+        <textarea
+          value={editContenido}
+          onChange={(e) => setEditContenido(e.target.value)}
+          style={{ width: '100%', height: '80px', marginBottom: '8px' }}
+        />
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={() => guardarEdicion(sol.id_solucion)} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+            GUARDAR
+          </button>
+          <button onClick={() => setRetoEditando(null)} style={{ backgroundColor: 'transparent', color: '#555', border: '1px solid #555', padding: '6px 14px', fontSize: '0.8rem' }}>
+            CANCELAR
+          </button>
+        </div>
+      </div>
+    ) : (
+      <button onClick={() => { setRetoEditando(sol.id_solucion); setEditContenido(sol.contenido_respuesta); }} style={{ backgroundColor: 'transparent', color: '#ffaa00', border: '1px solid #ffaa00', padding: '6px 14px', fontSize: '0.8rem' }}>
+        EDITAR SOLUCIÓN
+      </button>
+    )}
+  </div>
+)}
 
             {usuario && sol.id_usuario !== usuario.id_usuario && (
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>

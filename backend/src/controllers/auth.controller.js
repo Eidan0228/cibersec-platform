@@ -66,9 +66,8 @@ const login = async (req, res) => {
 
     return res.json({
       success: true,
-      data: { token, nombre: usuario.nombre, correo: usuario.correo, rol: usuario.rol }
+      data: { token, id_usuario: usuario.id_usuario, nombre: usuario.nombre, correo: usuario.correo, rol: usuario.rol }
     });
-
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
