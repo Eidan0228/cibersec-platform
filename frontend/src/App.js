@@ -11,6 +11,7 @@ import Chat from './pages/Chat';
 import Admin from './pages/Admin';
 import { useAuth } from './context/AuthContext';
 import CambiarContrasena from './pages/CambiarContrasena';
+import Perfil from './pages/Perfil';
 
 const RutaProtegida = ({ children }) => {
   const { usuario } = useAuth();
@@ -39,6 +40,7 @@ function App() {
         <Route path="/chat" element={<RutaProtegida><Chat /></RutaProtegida>} />
         <Route path="/admin" element={<RutaAdmin><Admin /></RutaAdmin>} />
         <Route path="/cambiar-contrasena" element={<RutaProtegida><CambiarContrasena /></RutaProtegida>} />
+        <Route path="/perfil" element={<RutaProtegida><Perfil /></RutaProtegida>} />
       </Routes>
     </Router>
   );
