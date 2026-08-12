@@ -11,6 +11,8 @@ const rankingRoutes = require('./routes/ranking.routes');
 const chatRoutes = require('./routes/chat.routes');
 const adminRoutes = require('./routes/admin.routes');
 const perfilRoutes = require('./routes/perfil.routes');
+const archivosRoutes = require('./routes/archivos.routes');
+const path = require('path');
 const app = express();
 
 app.use(cors());
@@ -25,6 +27,8 @@ app.use('/ranking', rankingRoutes);
 app.use('/chat', chatRoutes);
 app.use('/admin', adminRoutes);
 app.use('/perfil', perfilRoutes);
+app.use('/archivos', archivosRoutes);
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req, res) => {
   res.json({ success: true, data: 'Servidor funcionando correctamente' });
