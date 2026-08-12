@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
@@ -9,9 +9,10 @@ import CrearReto from './pages/CrearReto';
 import Ranking from './pages/Ranking';
 import Chat from './pages/Chat';
 import Admin from './pages/Admin';
-import { useAuth } from './context/AuthContext';
-import CambiarContrasena from './pages/CambiarContrasena';
 import Perfil from './pages/Perfil';
+import CambiarContrasena from './pages/CambiarContrasena';
+import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
 
 const RutaProtegida = ({ children }) => {
   const { usuario } = useAuth();
@@ -26,6 +27,16 @@ const RutaAdmin = ({ children }) => {
 };
 
 function App() {
+  const { oscuro } = useTheme();
+
+  useEffect(() => {
+    if (oscuro) {
+      document.body.classList.remove('tema-claro');
+    } else {
+      document.body.classList.add('tema-claro');
+    }
+  }, [oscuro]);
+
   return (
     <Router>
       <Navbar />
@@ -39,8 +50,8 @@ function App() {
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/chat" element={<RutaProtegida><Chat /></RutaProtegida>} />
         <Route path="/admin" element={<RutaAdmin><Admin /></RutaAdmin>} />
-        <Route path="/cambiar-contrasena" element={<RutaProtegida><CambiarContrasena /></RutaProtegida>} />
         <Route path="/perfil" element={<RutaProtegida><Perfil /></RutaProtegida>} />
+        <Route path="/cambiar-contrasena" element={<RutaProtegida><CambiarContrasena /></RutaProtegida>} />
       </Routes>
     </Router>
   );

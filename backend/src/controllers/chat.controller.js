@@ -36,7 +36,13 @@ const chat = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: error.message });
+    if (error.status === 429) {
+      return res.status(429).json({ success: false, message: 'Límite de requests alcanzado. Intenta en unos segundos.' });
+    }
+    if (error.status === 401) {
+      return res.status(401).json({ success: false, message: 'Error de autenticación con el servicio de IA.' });
+    }
+    return res.status(500).json({ success: false, message: 'Error al conectar con el chatbot. Intenta de nuevo.' });
   }
 };
 
