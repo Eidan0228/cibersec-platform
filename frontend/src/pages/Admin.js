@@ -22,7 +22,7 @@ const Admin = () => {
       return;
     }
     cargarDatos();
-  }, []);
+  }, [usuario, navigate]);
 
  const cargarDatos = async () => {
   try {
