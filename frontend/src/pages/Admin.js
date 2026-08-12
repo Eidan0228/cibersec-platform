@@ -14,6 +14,7 @@ const Admin = () => {
   const [mensaje, setMensaje] = useState('');
   const [retoEditando, setRetoEditando] = useState(null);
   const [formReto, setFormReto] = useState({});
+  const [metricas, setMetricas] = useState(null);
 
   useEffect(() => {
     if (!usuario || usuario.rol !== 'ADMIN') {
@@ -23,20 +24,22 @@ const Admin = () => {
     cargarDatos();
   }, []);
 
-  const cargarDatos = async () => {
-    try {
-      const [u, s, r] = await Promise.all([
-        api.get('/admin/usuarios'),
-        api.get('/admin/soluciones'),
-        api.get('/admin/retos')
-      ]);
-      setUsuarios(u.data.data);
-      setSoluciones(s.data.data);
-      setRetos(r.data.data);
-    } catch (err) {
-      setError('Error al cargar datos');
-    }
-  };
+ const cargarDatos = async () => {
+  try {
+    const [u, s, r, m] = await Promise.all([
+      api.get('/admin/usuarios'),
+      api.get('/admin/soluciones'),
+      api.get('/admin/retos'),
+      api.get('/admin/metricas')
+    ]);
+    setUsuarios(u.data.data);
+    setSoluciones(s.data.data);
+    setRetos(r.data.data);
+    setMetricas(m.data.data);
+  } catch (err) {
+    setError('Error al cargar datos');
+  }
+};
 
   const eliminarUsuario = async (id) => {
     if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
@@ -110,6 +113,7 @@ const Admin = () => {
         <button onClick={() => setVista('usuarios')} style={btnStyle(vista === 'usuarios')}>USUARIOS ({usuarios.length})</button>
         <button onClick={() => setVista('soluciones')} style={btnStyle(vista === 'soluciones')}>SOLUCIONES ({soluciones.length})</button>
         <button onClick={() => setVista('retos')} style={btnStyle(vista === 'retos')}>RETOS ({retos.length})</button>
+        <button onClick={() => setVista('metricas')} style={btnStyle(vista === 'metricas')}>MÉTRICAS</button>
       </div>
 
       {vista === 'usuarios' && (
@@ -189,6 +193,44 @@ const Admin = () => {
           ))}
         </div>
       )}
+      {vista === 'metricas' && metricas && (
+  <div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+      {[
+        { label: 'USUARIOS', valor: metricas.totalUsuarios },
+        { label: 'RETOS', valor: metricas.totalRetos },
+        { label: 'SOLUCIONES', valor: metricas.totalSoluciones },
+        { label: 'COMENTARIOS', valor: metricas.totalComentarios },
+        { label: 'EVALUACIONES', valor: metricas.totalEvaluaciones }
+      ].map(stat => (
+        <div key={stat.label} style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--accent)', borderRadius: '6px', padding: '20px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--accent)', fontSize: '2rem', fontWeight: 'bold' }}>{stat.valor}</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{stat.label}</p>
+        </div>
+      ))}
+    </div>
+
+    <h3 style={{ color: 'var(--accent)', marginBottom: '15px', fontSize: '1rem' }}>&gt; TOP 3 USUARIOS</h3>
+    <div style={{ display: 'grid', gap: '10px', marginBottom: '25px' }}>
+      {metricas.topUsuarios.map((u, i) => (
+        <div key={i} style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '15px', display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ color: 'var(--text-primary)' }}>#{i + 1} {u.nombre}</span>
+          <span style={{ color: 'var(--accent)' }}>{u.puntos_totales} pts</span>
+        </div>
+      ))}
+    </div>
+
+    <h3 style={{ color: 'var(--accent)', marginBottom: '15px', fontSize: '1rem' }}>&gt; SOLUCIONES POR ESTADO</h3>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px' }}>
+      {metricas.solucionesPorEstado.map(s => (
+        <div key={s.estado} style={{ backgroundColor: 'var(--bg-secondary)', border: `1px solid ${s.estado === 'APROBADO' ? 'var(--accent)' : s.estado === 'RECHAZADO' ? 'var(--danger)' : 'var(--warning)'}`, borderRadius: '6px', padding: '15px', textAlign: 'center' }}>
+          <p style={{ color: s.estado === 'APROBADO' ? 'var(--accent)' : s.estado === 'RECHAZADO' ? 'var(--danger)' : 'var(--warning)', fontSize: '1.5rem', fontWeight: 'bold' }}>{s._count.estado}</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{s.estado}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
     </div>
   );
 };

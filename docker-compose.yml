@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: cibersec_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cibersec_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: cibersec_backend
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/cibersec_db
+      JWT_SECRET: cibersec_jwt_secret_2024
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    command: sh -c "npx prisma migrate deploy && node src/server.js"
+
+  frontend:
+    build: ./frontend
+    container_name: cibersec_frontend
+    environment:
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+
+  

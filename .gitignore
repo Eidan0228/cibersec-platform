@@ -8,3 +8,5 @@ frontend/.env
 
 # Prisma
 backend/prisma/migrations
+
+backend/uploads/

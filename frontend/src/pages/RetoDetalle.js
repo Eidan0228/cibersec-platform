@@ -13,6 +13,9 @@ const RetoDetalle = () => {
   const { id } = useParams();
   const { usuario } = useAuth();
   const navigate = useNavigate();
+  const [archivos, setArchivos] = useState([]);
+const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
+const [subiendoArchivo, setSubiendoArchivo] = useState(false);
   const [reto, setReto] = useState(null);
   const [soluciones, setSoluciones] = useState([]);
   const [respuesta, setRespuesta] = useState('');
@@ -25,18 +28,20 @@ const [retoEditando, setRetoEditando] = useState(null);
 const [editContenido, setEditContenido] = useState('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await api.get(`/retos/${id}`);
-        setReto(res.data.data);
-        const sol = await api.get(`/soluciones/reto/${id}`);
-        setSoluciones(sol.data.data);
-      } catch (err) {
-        setError('Error al cargar el reto');
-      }
-    };
-    fetchData();
-  }, [id]);
+  const fetchData = async () => {
+    try {
+      const res = await api.get(`/retos/${id}`);
+      setReto(res.data.data);
+      const sol = await api.get(`/soluciones/reto/${id}`);
+      setSoluciones(sol.data.data);
+      const archivosRes = await api.get(`/archivos/reto/${id}`);
+      setArchivos(archivosRes.data.data);
+    } catch (err) {
+      setError('Error al cargar el reto');
+    }
+  };
+  fetchData();
+}, [id]);
 
   const guardarEdicion = async (id_solucion) => {
   try {
@@ -47,6 +52,26 @@ const [editContenido, setEditContenido] = useState('');
     setSoluciones(sol.data.data);
   } catch (err) {
     setError(err.response?.data?.message || 'Error al editar solución');
+  }
+};
+
+const subirArchivo = async () => {
+  if (!archivoSeleccionado) return;
+  setSubiendoArchivo(true);
+  try {
+    const formData = new FormData();
+    formData.append('archivo', archivoSeleccionado);
+    await api.post(`/archivos/reto/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    setMensaje('✓ Archivo subido correctamente');
+    setArchivoSeleccionado(null);
+    const res = await api.get(`/archivos/reto/${id}`);
+    setArchivos(res.data.data);
+  } catch (err) {
+    setError(err.response?.data?.message || 'Error al subir archivo');
+  } finally {
+    setSubiendoArchivo(false);
   }
 };
 
@@ -147,7 +172,38 @@ const [editContenido, setEditContenido] = useState('');
           {mensaje}
         </div>
       )}
+{archivos.length > 0 && (
+  <div style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '20px', marginBottom: '20px' }}>
+    <h3 style={{ color: 'var(--accent)', marginBottom: '10px', fontSize: '1rem' }}>&gt; ARCHIVOS ADJUNTOS</h3>
+    {archivos.map(a => (
+      <div key={a.id_archivo} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>📎 {a.nombre_archivo}</span>
+        <a href={`http://localhost:3000/uploads/${a.ruta.split('\\').pop().split('/').pop()}`} target="_blank" rel="noreferrer">
+          <button style={{ padding: '4px 10px', fontSize: '0.75rem' }}>DESCARGAR</button>
+        </a>
+      </div>
+    ))}
+  </div>
+)}
 
+{usuario && reto.id_creador === usuario.id_usuario && (
+  <div style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '20px', marginBottom: '20px' }}>
+    <h3 style={{ color: 'var(--accent)', marginBottom: '15px', fontSize: '1rem' }}>&gt; SUBIR ARCHIVO</h3>
+    <input
+      type="file"
+      onChange={(e) => setArchivoSeleccionado(e.target.files[0])}
+      style={{ marginBottom: '10px' }}
+      accept=".jpg,.jpeg,.png,.gif,.pdf,.txt"
+    />
+    <button
+      onClick={subirArchivo}
+      disabled={!archivoSeleccionado || subiendoArchivo}
+      style={{ padding: '8px 16px', fontSize: '0.85rem', opacity: !archivoSeleccionado || subiendoArchivo ? 0.5 : 1 }}
+    >
+      {subiendoArchivo ? 'SUBIENDO...' : 'SUBIR ARCHIVO →'}
+    </button>
+  </div>
+)}
       {usuario && (
         <div style={{ backgroundColor: '#0d0d1a', border: '1px solid #1a1a3e', borderRadius: '6px', padding: '25px', marginBottom: '30px' }}>
           <h3 style={{ color: '#00ff88', marginBottom: '15px', fontSize: '1rem', letterSpacing: '1px' }}>&gt; ENVIAR SOLUCIÓN</h3>
