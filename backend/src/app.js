@@ -2,6 +2,14 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: 'Demasiadas solicitudes, intenta en 15 minutos.' }
+});
+
 const authRoutes = require('./routes/auth.routes');
 const retosRoutes = require('./routes/retos.routes');
 const solucionesRoutes = require('./routes/soluciones.routes');
@@ -18,6 +26,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(limiter);
 app.use('/auth', authRoutes);
 app.use('/retos', retosRoutes);
 app.use('/soluciones', solucionesRoutes);
