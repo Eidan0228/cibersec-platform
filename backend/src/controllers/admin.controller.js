@@ -116,5 +116,41 @@ const editarRetoAdmin = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 };
+const obtenerMetricas = async (req, res) => {
+  try {
+    const [totalUsuarios, totalRetos, totalSoluciones, totalComentarios, totalEvaluaciones, solucionesPorEstado] = await Promise.all([
+      prisma.usuario.count(),
+      prisma.reto.count(),
+      prisma.solucion.count(),
+      prisma.comentario.count(),
+      prisma.evaluacion.count(),
+      prisma.solucion.groupBy({
+        by: ['estado'],
+        _count: { estado: true }
+      })
+    ]);
 
-module.exports = { obtenerUsuarios, eliminarUsuario, cambiarEstadoSolucion, obtenerTodasSoluciones, obtenerTodosRetos, editarRetoAdmin };
+    const topUsuarios = await prisma.usuario.findMany({
+      select: { nombre: true, puntos_totales: true },
+      orderBy: { puntos_totales: 'desc' },
+      take: 3
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        totalUsuarios,
+        totalRetos,
+        totalSoluciones,
+        totalComentarios,
+        totalEvaluaciones,
+        solucionesPorEstado,
+        topUsuarios
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+};
+
+module.exports = { obtenerUsuarios, eliminarUsuario, cambiarEstadoSolucion, obtenerTodasSoluciones, obtenerTodosRetos, editarRetoAdmin, obtenerMetricas };

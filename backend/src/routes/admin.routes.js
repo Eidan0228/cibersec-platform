@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { obtenerUsuarios, eliminarUsuario, cambiarEstadoSolucion, obtenerTodasSoluciones, obtenerTodosRetos, editarRetoAdmin } = require('../controllers/admin.controller');
+const { obtenerUsuarios, eliminarUsuario, cambiarEstadoSolucion, obtenerTodasSoluciones, obtenerTodosRetos, editarRetoAdmin, obtenerMetricas } = require('../controllers/admin.controller');
 const { verificarToken } = require('../middlewares/auth.middleware');
 const { esAdmin } = require('../middlewares/admin.middleware');
 
@@ -10,5 +10,6 @@ router.get('/soluciones', verificarToken, esAdmin, obtenerTodasSoluciones);
 router.put('/soluciones/:id/estado', verificarToken, esAdmin, cambiarEstadoSolucion);
 router.get('/retos', verificarToken, esAdmin, obtenerTodosRetos);
 router.put('/retos/:id', verificarToken, esAdmin, editarRetoAdmin);
+router.get('/metricas', verificarToken, esAdmin, obtenerMetricas);
 
 module.exports = router;
